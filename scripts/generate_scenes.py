@@ -49,8 +49,16 @@ def main(argv):
         help="Path to the output directory"
     )
     parser.add_argument(
-        "path_to_pickled_3d_futute_models",
-        help="Path to the 3D-FUTURE model meshes"
+        "path_to_3d_front_dataset_directory",
+        help="Path to the 3D-FRONT dataset"
+    )
+    parser.add_argument(
+        "path_to_3d_future_dataset_directory",
+        help="Path to the 3D-FUTURE dataset"
+    )
+    parser.add_argument(
+        "path_to_model_info",
+        help="Path to the 3D-FUTURE model_info.json file"
     )
     parser.add_argument(
         "path_to_floor_plan_textures",
@@ -150,8 +158,10 @@ def main(argv):
     )
 
     # Build the dataset of 3D models
-    objects_dataset = ThreedFutureDataset.from_pickled_dataset(
-        args.path_to_pickled_3d_futute_models
+    objects_dataset = ThreedFutureDataset.from_dataset_directory(
+        dataset_directory=args.path_to_3d_front_dataset_directory,
+        path_to_model_info=args.path_to_model_info,
+        path_to_models=args.path_to_3d_future_dataset_directory
     )
     print("Loaded {} 3D-FUTURE models".format(len(objects_dataset)))
 
@@ -198,7 +208,7 @@ def main(argv):
             current_scene, args.path_to_floor_plan_textures
         )
 
-        bbox_params = network.generate_boxes(room_mask=room_mask)
+        bbox_params = network.generate_boxes(room_mask=room_mask.to(device), device=device)
         boxes = dataset.post_process(bbox_params)
         bbox_params_t = torch.cat([
             boxes["class_labels"],
