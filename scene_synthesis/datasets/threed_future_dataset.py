@@ -29,7 +29,12 @@ class ThreedFutureDataset(object):
         return self.objects[idx]
 
     def _filter_objects_by_label(self, label):
-        return [oi for oi in self.objects if oi.label == label]
+        objects = []
+        for oi in self.objects:
+            oi_label = oi.label.lower().replace(" ", "_")
+            if oi_label == label:
+                objects.append(oi)
+        return objects
 
     def get_closest_furniture_to_box(self, query_label, query_size):
         objects = self._filter_objects_by_label(query_label)
@@ -38,7 +43,10 @@ class ThreedFutureDataset(object):
         for i, oi in enumerate(objects):
             mses[oi] = np.sum((oi.size - query_size)**2, axis=-1)
         sorted_mses = [k for k, v in sorted(mses.items(), key=lambda x:x[1])]
-        return sorted_mses[0]
+        if len(sorted_mses) > 0:
+            return sorted_mses[0]
+        else:
+            return None    
 
     def get_closest_furniture_to_2dbox(self, query_label, query_size):
         objects = self._filter_objects_by_label(query_label)

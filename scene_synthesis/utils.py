@@ -25,6 +25,9 @@ def get_textured_objects(bbox_params_t, objects_dataset, classes):
             query_label, query_size
         )
 
+        if furniture is None:
+            continue
+
         # Load the furniture and scale it as it is given in the dataset
         raw_mesh = TexturedMesh.from_file(furniture.raw_model_path)
         raw_mesh.scale(furniture.scale)
